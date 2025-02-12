@@ -1,0 +1,32 @@
+
+
+
+----- Wires for Inner0 -----
+
+
+
+-     Wires for U plane  -
+
+ Uplane_y: 599.025
+ Uplane_z: 230.6375
+
+-     Wires for V plane  -
+
+ Vplane_y: 598.7075
+ Vplane_z: 230.0025
+
+
+
+----- Wires for Outer -----
+
+
+
+-     Wires for U plane  -
+
+ Uplane_y: 599.025
+ Uplane_z: 230.6375
+
+-     Wires for V plane  -
+
+ Vplane_y: 598.7075
+ Vplane_z: 230.0025
