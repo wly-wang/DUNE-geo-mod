@@ -203,7 +203,7 @@ if($protoDune==1){
 }
 
  #InnerDrift is the max distance form the edge of the CPA to the edge of the first wire plane
-$InnerDrift              = 359.4;
+$InnerDrift              = 2*359.4;
 $OuterDrift              = $SpaceAPAToCryoWall;
 $APAFrame_x              = 5.0661; # ~2in -- this does not include the wire spacing
 
@@ -285,8 +285,8 @@ $FC_x                   =       ($nAPAWide-1)*$APAToAPA
                               + $APA_UtoU_x + $TPCWirePlaneThickness;
 
 if($workspace==1||$workspace==2){ # this is arbitrary for the workspace, but size down a little
-$Argon_x = 2*$CPAToAPA + $Cathode_x + 2*$SpaceAPAToCryoWall;
-$FC_x    = 2*$CPAToAPA + $Cathode_x;
+$Argon_x = $CPAToAPA + $Cathode_x + 2*$SpaceAPAToCryoWall;
+$FC_x    = $CPAToAPA + $Cathode_x;
 }
 
 
@@ -408,7 +408,6 @@ $ArapucaOut_z = 209.2;
 $ArapucaIn_x = 2.4;
 $ArapucaIn_y = 9.3;
 $ArapucaIn_z = 46.8;
-$ArapucaSingleAcceptanceWindow_x = 1.0; #single sided
 $ArapucaAcceptanceWindow_x = 2.2;
 $ArapucaAcceptanceWindow_y = 9.3;
 $ArapucaAcceptanceWindow_z = 46.8;
@@ -1416,18 +1415,18 @@ print CRYO <<EOF;
       x="@{[$FC_x+1]}"
       y="@{[$FCI_y]}"
       z="@{[$FCI_z]}"/>
-     <subtraction name="FieldCage">
+    <subtraction name="FieldCage">
       <first ref="FieldCageOut"/>
       <second ref="FieldCageIn"/>
-      </subtraction>
+    </subtraction>
     <box name="GaseousArgon" lunit="cm"
       x="@{[$Argon_x]}"
       y="@{[$HeightGaseousAr]}"
       z="@{[$Argon_z]}"/>
-     <subtraction name="SteelShell">
+    <subtraction name="SteelShell">
       <first ref="Cryostat"/>
       <second ref="ArgonInterior"/>
-      </subtraction>
+    </subtraction>
     <box name="Cathode" lunit="cm"
       x="@{[$Cathode_x]}"
       y="@{[$Cathode_y]}"
@@ -1438,41 +1437,42 @@ print CRYO <<EOF;
       y="@{[$ArapucaOut_y]}"
       z="@{[$ArapucaOut_z]}"/>
 
-    <box name="ArapucaSingleIn" lunit="cm"
-      x="@{[$ArapucaOut_x]}"
-      y="@{[$ArapucaAcceptanceWindow_y]}"
-      z="@{[$ArapucaAcceptanceWindow_z]}"/>
-     <subtraction name="ArapucaSingleWalls0">
+    <box name="ArapucaIn" lunit="cm"
+      x="@{[$ArapucaIn_x]}"
+      y="@{[$ArapucaIn_y]}"
+      z="@{[$ArapucaIn_z]}"/>
+
+     <subtraction name="ArapucaWalls0">
       <first  ref="ArapucaOut"/>
-      <second ref="ArapucaSingleIn"/>
+      <second ref="ArapucaIn"/>
       <positionref ref="posArapucaSub0"/>
       </subtraction>
-     <subtraction name="ArapucaSingleWalls1">
-      <first  ref="ArapucaSingleWalls0"/>
-      <second ref="ArapucaSingleIn"/>
+     <subtraction name="ArapucaWalls1">
+      <first  ref="ArapucaWalls0"/>
+      <second ref="ArapucaIn"/>
       <positionref ref="posArapucaSub1"/>
       </subtraction>
-     <subtraction name="ArapucaSingleWalls2">
-      <first  ref="ArapucaSingleWalls1"/>
-      <second ref="ArapucaSingleIn"/>
+     <subtraction name="ArapucaWalls2">
+      <first  ref="ArapucaWalls1"/>
+      <second ref="ArapucaIn"/>
       <positionref ref="posArapucaSub2"/>
       </subtraction>
-     <subtraction name="ArapucaSingleWalls">
-      <first  ref="ArapucaSingleWalls2"/>
-      <second ref="ArapucaSingleIn"/>
+     <subtraction name="ArapucaWalls">
+      <first  ref="ArapucaWalls2"/>
+      <second ref="ArapucaIn"/>
       <positionref ref="posArapucaSub3"/>
       </subtraction>
 
-    <box name="ArapucaSingleAcceptanceWindow" lunit="cm"
-      x="@{[$ArapucaSingleAcceptanceWindow_x]}"
+    <box name="ArapucaAcceptanceWindow" lunit="cm"
+      x="@{[$ArapucaAcceptanceWindow_x]}"
       y="@{[$ArapucaAcceptanceWindow_y]}"
       z="@{[$ArapucaAcceptanceWindow_z]}"/>
 
-    <box name="APAFrameYSideHollow" lunit="cm"
+     <box name="APAFrameYSideHollow" lunit="cm"
       x="@{[$APAFrameYSide_x-2*$EdgeFrameSteelThickness]}"
       y="@{[$APAFrameYSide_y-2*$EdgeFrameSteelThickness]}"
       z="@{[$APAFrameYSide_z]}"/>
-    <box name="APAFrameYSideShell" lunit="cm"
+     <box name="APAFrameYSideShell" lunit="cm"
       x="@{[$APAFrameYSide_x]}"
       y="@{[$APAFrameYSide_y]}"
       z="@{[$APAFrameYSide_z]}"/>
@@ -1483,11 +1483,11 @@ print CRYO <<EOF;
       <rotationref ref="rIdentity"/>
       </subtraction>
 
-    <box name="APAFrameZSideHollow" lunit="cm"
+     <box name="APAFrameZSideHollow" lunit="cm"
       x="@{[$APAFrameZSide_x-2*$EdgeFrameSteelThickness]}"
       y="@{[$APAFrameZSide_y-2*$EdgeFrameSteelThickness]}"
       z="@{[$APAFrameZSide_z]}"/>
-    <box name="APAFrameZSideShell" lunit="cm"
+     <box name="APAFrameZSideShell" lunit="cm"
       x="@{[$APAFrameZSide_x]}"
       y="@{[$APAFrameZSide_y]}"
       z="@{[$APAFrameZSide_z]}"/>
@@ -1498,18 +1498,18 @@ print CRYO <<EOF;
       <rotationref ref="rIdentity"/>
       </subtraction>
 
-    <box name="APAFrameYOuterSupport" lunit="cm"
+     <box name="APAFrameYOuterSupport" lunit="cm"
       x="@{[$EdgeFrameSteelThickness]}"
       y="@{[$APAFrameYOuterSupport_y]}"
       z="@{[$APAFrameYOuterSupport_z]}"/>
 
 
-    <box name="G10BoardYSideCenterSeg" lunit="cm"
+     <box name="G10BoardYSideCenterSeg" lunit="cm"
       x="@{[$G10BoardYSide_x]}"
       y="@{[$G10BoardYSide_y]}"
       z="@{[$G10BoardYSide_z]}"/>
 
-    <box name="G10BoardZSideCenterSeg" lunit="cm"
+     <box name="G10BoardZSideCenterSeg" lunit="cm"
       x="@{[$G10BoardZSide_x]}"
       y="@{[$G10BoardZSide_y]}"
       z="@{[$G10BoardZSide_z]}"/>
@@ -1548,20 +1548,7 @@ for($ncuts=0 ; $ncuts<4; $ncuts++){
 print CRYO <<EOF;
    <volume name="volOpDetSensitive_$i\-$p\-$ncuts">
      <materialref ref="LAr"/>
-     <solidref ref="ArapucaSingleAcceptanceWindow"/>
-   </volume>
-EOF
-}
-}
-}
-
-for($i=0 ; $i<$nAPAs ; $i++){
-for($p=0 ; $p<10 ; $p++){
-for($ncuts=0 ; $ncuts<4; $ncuts++){
-print CRYO <<EOF;
-   <volume name="volOpDetSensitiveCPA_$i\-$p\-$ncuts">
-     <materialref ref="LAr"/>
-     <solidref ref="ArapucaSingleAcceptanceWindow"/>
+     <solidref ref="ArapucaAcceptanceWindow"/>
    </volume>
 EOF
 }
@@ -1573,18 +1560,7 @@ for($p=0 ; $p<10 ; $p++){
 print CRYO <<EOF;
    <volume name="volArapuca_$i\-$p">
      <materialref ref="FR4SussexAPA"/>
-     <solidref ref="ArapucaSingleWalls"/>
-   </volume>
-EOF
-}
-}
-
-for($i=0 ; $i<$nAPAs ; $i++){
-for($p=0 ; $p<10 ; $p++){
-print CRYO <<EOF;
-   <volume name="volArapucaCPA_$i\-$p">
-     <materialref ref="FR4SussexAPA"/>
-     <solidref ref="ArapucaSingleWalls"/>
+     <solidref ref="ArapucaWalls"/>
    </volume>
 EOF
 }
@@ -1684,7 +1660,7 @@ if ($tpc_on==1) {
                              + $SpaceAPAToCryoWall + $APA_UtoU_x/2 + $TPCWirePlaneThickness/2
                                  + $i*$APAToAPA;
 
-            $CPA_x        =  $APACenter_x  +  $CPAToAPA;
+            $CPA_x        =  $APACenter_x  +  2*$CPAToAPA;
 
 
             place_APA($APACenter_x, $APACenter_y, $APACenter_z, $apa_i, $j);
@@ -1754,20 +1730,11 @@ EOF
         # Make the workspace have only one center APA with CPAs and the full drift on either side
         elsif( $workspace == 1 || $workspace==2 ){
 
-            $APACenter_x  =  0;
-            $APACenter_x_test_mod_1 = $APACenter_x + $CPAToAPA;  # Changing the coordinate to move the apa to one of the cpa place, making 1 large drift volume
+            $APACenter_x  =  $CPAToAPA/2;
             $CPA_0_x      =  $APACenter_x  -  $CPAToAPA;
-            #$CPA_1_x      =  $APACenter_x  +  $CPAToAPA;
 
-
-            place_APA($APACenter_x_test_mod_1, $APACenter_y, $APACenter_z, $apa_i, $j);
-            place_OpDets($APACenter_x_test_mod_1, $APACenter_y, $APACenter_z, $apa_i, $APACenter_x_test_mod_1);
-            # The cpa cathode needs to be specifically tuned, so placeOpDet have two arg for apa_centerx, the last
-            # one is specifically for volArapuca, this is to avoid overlaps b/w arapuca and the volTPCInner, since 
-            # we do not have holes in the cathode to place the Arapucas, making holes in cathode for placing arapucas
-            # is a good idea that can be implemented if time allows.
-            place_OpDets_cpa(($CPA_0_x+0.7), $APACenter_y, $APACenter_z, $apa_i, ($CPA_0_x+0.38305));  
-            
+            place_APA($APACenter_x, $APACenter_y, $APACenter_z, $apa_i, $j);
+            place_OpDets($APACenter_x, $APACenter_y, $APACenter_z, $apa_i);
 
             $tpc_0 = 2*$apa_i+0;
             $tpc_1 = 2*$apa_i+1;
@@ -1778,58 +1745,17 @@ EOF
             if($j == 0)           { $rot_0 = "rPlus180AboutXPlus180AboutY";
                               $rot_1 = "rPlus180AboutX"; } #put the readout end at the bottom for bottom APAs
 
-# this part for original 1x2x6 geometry
-# print CRYO <<EOF;
-
-#       <physvol>
-#         <volumeref ref="volTPCInner0"/>
-#         <position name="posTPC\-$tpc_0" unit="cm"
-#         x="@{[$APACenter_x - $APAFrame_x/2 - $TPCInner_x/2]}"
-#         y="@{[$APACenter_y]}"
-#         z="@{[$APACenter_z]}"/>
-#         <rotationref ref="$rot_0"/>
-#       </physvol>
-#       <!--
-#       <physvol>
-#         <volumeref ref="volTPCInner1"/>
-#         <position name="posTPC\-$tpc_1" unit="cm"
-#         x="@{[$APACenter_x + $APAFrame_x/2 + $TPCInner_x/2]}"
-#         y="@{[$APACenter_y]}"
-#         z="@{[$APACenter_z]}"/>
-#         <rotationref ref="$rot_1"/>
-#       </physvol>
-#       -->
-
-#       <physvol>
-#         <volumeref ref="volCathode"/>
-#         <position name="posCathode\-$apa_i-0" unit="cm"
-#       x="@{[$CPA_0_x]}"
-#       y="@{[$APACenter_y]}"
-#       z="@{[$APACenter_z]}"/>
-#         <rotationref ref="rIdentity"/>
-#       </physvol>
-#       <physvol>
-#         <volumeref ref="volCathode"/>
-#         <position name="posCathode\-$apa_i-1" unit="cm"
-#       x="@{[$CPA_1_x]}"
-#       y="@{[$APACenter_y]}"
-#       z="@{[$APACenter_z]}"/>
-#         <rotationref ref="rIdentity"/>
-#       </physvol>
-
-# EOF
-
-# Modded version, removing to have only 1 drift volume. 
 print CRYO <<EOF;
 
       <physvol>
-        <volumeref ref="volTPCInner0"/>
+        <volumeref ref="volTPCInner"/>
         <position name="posTPC\-$tpc_0" unit="cm"
-        x="@{[$APACenter_x - $APAFrame_x/2 - $TPCInner_x + 2*$CPAToAPA -2]}"
+        x="@{[$APACenter_x - $APAFrame_x/2 - $TPCInner_x/2]}"
         y="@{[$APACenter_y]}"
         z="@{[$APACenter_z]}"/>
         <rotationref ref="$rot_0"/>
       </physvol>
+
       <physvol>
         <volumeref ref="volCathode"/>
         <position name="posCathode\-$apa_i-0" unit="cm"
@@ -1871,19 +1797,16 @@ sub place_OpDets()
     $APACenter_y = $_[1];
     $APACenter_z = $_[2];
     $apa_i = $_[3];
-    $arapuca_pos_x = $_[4];
 
     # Alternate the paddle orientations
-    # if ($apa_i % 2 == 0){
-	  #   $rot = "rPlus180AboutY";
-	  #   $posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x-0.1);
-    if ($APACenter_x < 0){
-	    $rot = "rPlus180AboutY";
-	    $posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x-0.1);
+    if ( $apa_i % 2 == 0 ) {
+	$rot = "rIdentity";
+	$posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x-0.1);
     }else{
-	    $rot = "rIdentity";
-	    $posAra_x = ($APACenter_x-0.5*$ArapucaOut_x+0.5*$ArapucaAcceptanceWindow_x+0.1);
-	  }
+	$rot = "rPlus180AboutY";
+	$posAra_x = ($APACenter_x-0.5*$ArapucaOut_x+0.5*$ArapucaAcceptanceWindow_x+0.1);
+	     }
+
 
 for ($paddle = 0; $paddle<$nLightPaddlesPerAPA; $paddle++)
 {
@@ -1905,7 +1828,7 @@ print CRYO <<EOF;
 <physvol>
 <volumeref ref="volArapuca_$apa_i\-$paddle"/>
 <position name="posArapuca$apa_i\-$paddle\-TPC\-$i\-$j\-$k" unit="cm"
-x="@{[$arapuca_pos_x]}"
+x="@{[$APACenter_x]}"
 y="@{[$Paddle_Y]}"
 z="@{[$APACenter_z]}"/>
 <rotationref ref="$rot"/>
@@ -1919,72 +1842,7 @@ for($nwindow=0 ; $nwindow<4; $nwindow++){
        <volumeref ref="volOpDetSensitive_$apa_i\-$paddle\-$nwindow"/>
        <position name="posOpArapuca$apa_i\-$paddle\-$nwindow\-TPC\-$i\-$j\-$k" unit="cm"
          x="@{[$posAra_x]}"
-         y="@{[$Paddle_Y]}"
-         z="@{[$list_pos[$nwindow]+$APACenter_z]}"/>
-       <rotationref ref="$rot"/>
-     </physvol>
-EOF
-}#end nwindow for-loop
-}#end Paddle for-loop
-
-}
-
-sub place_OpDets_cpa()
-{
-
-    $APACenter_x = $_[0];
-    $APACenter_y = $_[1];
-    $APACenter_z = $_[2];
-    $apa_i = $_[3];
-    $arapuca_pos_x = $_[4];
-
-    # Alternate the paddle orientations
-    # if ($apa_i % 2 == 0){
-	  #   $rot = "rPlus180AboutY";
-	  #   $posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x-0.1);
-    if ($APACenter_x < 0){
-	    $rot = "rPlus180AboutY";
-	    $posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x-0.1);
-    }else{
-	    $rot = "rIdentity";
-	    $posAra_x = ($APACenter_x-0.5*$ArapucaOut_x+0.5*$ArapucaAcceptanceWindow_x+0.1);
-	  }
-
-for ($paddle = 0; $paddle<$nLightPaddlesPerAPA; $paddle++)
-{
-
-             # All Light Paddle centers will have the same
-             #      X coordinate as the center of the current APA
-             #      Z coordinate as the current TPC pair
-             # The Y coordinate must be looped over:
-
-             #the multiplication by j here is a temporary dirty trick to get around some strange behavior
-
-             $Paddle_Y   =    $APACenter_y
-                            - $APAphys_y/2
-                            + $j*$FrameToPaddleSpace
-                            + (1-$j)*($ArapucaOut_y/2 + $APAFrameZSide_y)
-                            + $PaddleYInterval*$paddle;
-
-print CRYO <<EOF;
-<physvol>
-<volumeref ref="volArapucaCPA_$apa_i\-$paddle"/>
-<position name="posArapuca$apa_i\-$paddle\-TPC\-$i\-$j\-$k\-cpa" unit="cm"
-x="@{[$arapuca_pos_x]}"
-y="@{[$Paddle_Y]}"
-z="@{[$APACenter_z]}"/>
-<rotationref ref="$rot"/>
-</physvol>
-EOF
-
-
-for($nwindow=0 ; $nwindow<4; $nwindow++){
-             print CRYO <<EOF;
-     <physvol>
-       <volumeref ref="volOpDetSensitiveCPA_$apa_i\-$paddle\-$nwindow"/>
-       <position name="posOpArapuca$apa_i\-$paddle\-$nwindow\-TPC\-$i\-$j\-$k\-cpa" unit="cm"
-         x="@{[$posAra_x]}"
-         y="@{[$Paddle_Y]}"
+       y="@{[$Paddle_Y]}"
          z="@{[$list_pos[$nwindow]+$APACenter_z]}"/>
        <rotationref ref="$rot"/>
      </physvol>
@@ -2481,8 +2339,7 @@ gen_Define();        # generates definitions at beginning of GDML
 gen_Materials(); # generates materials to be used
 
 
-    gen_TPC( (2*$TPCInner_x),  $TPC_y,  $TPC_z,  'Inner0'); #for one active volume, change name to "Inner" and remove next line
-    # gen_TPC( $TPCInner_x,  $TPC_y,  $TPC_z,  'Inner1');
+    gen_TPC( $TPCInner_x,  $TPC_y,  $TPC_z,  'Inner'); #for one active volume, change name to "Inner" and remove next line
     gen_TPC( $TPCOuter_x,  $TPC_y,  $TPC_z,  'Outer');
 
 close $wout;
