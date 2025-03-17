@@ -408,6 +408,7 @@ $ArapucaOut_z = 209.2;
 $ArapucaIn_x = 2.4;
 $ArapucaIn_y = 9.3;
 $ArapucaIn_z = 46.8;
+$ArapucaSingleAcceptanceWindow_x = 1.0; #single sided
 $ArapucaAcceptanceWindow_x = 2.2;
 $ArapucaAcceptanceWindow_y = 9.3;
 $ArapucaAcceptanceWindow_z = 46.8;
@@ -1437,34 +1438,33 @@ print CRYO <<EOF;
       y="@{[$ArapucaOut_y]}"
       z="@{[$ArapucaOut_z]}"/>
 
-    <box name="ArapucaIn" lunit="cm"
-      x="@{[$ArapucaIn_x]}"
-      y="@{[$ArapucaIn_y]}"
-      z="@{[$ArapucaIn_z]}"/>
-
-     <subtraction name="ArapucaWalls0">
+    <box name="ArapucaSingleIn" lunit="cm"
+      x="@{[$ArapucaOut_x]}"
+      y="@{[$ArapucaAcceptanceWindow_y]}"
+      z="@{[$ArapucaAcceptanceWindow_z]}"/>
+     <subtraction name="ArapucaSingleWalls0">
       <first  ref="ArapucaOut"/>
-      <second ref="ArapucaIn"/>
+      <second ref="ArapucaSingleIn"/>
       <positionref ref="posArapucaSub0"/>
       </subtraction>
-     <subtraction name="ArapucaWalls1">
-      <first  ref="ArapucaWalls0"/>
-      <second ref="ArapucaIn"/>
+     <subtraction name="ArapucaSingleWalls1">
+      <first  ref="ArapucaSingleWalls0"/>
+      <second ref="ArapucaSingleIn"/>
       <positionref ref="posArapucaSub1"/>
       </subtraction>
-     <subtraction name="ArapucaWalls2">
-      <first  ref="ArapucaWalls1"/>
-      <second ref="ArapucaIn"/>
+     <subtraction name="ArapucaSingleWalls2">
+      <first  ref="ArapucaSingleWalls1"/>
+      <second ref="ArapucaSingleIn"/>
       <positionref ref="posArapucaSub2"/>
       </subtraction>
-     <subtraction name="ArapucaWalls">
-      <first  ref="ArapucaWalls2"/>
-      <second ref="ArapucaIn"/>
+     <subtraction name="ArapucaSingleWalls">
+      <first  ref="ArapucaSingleWalls2"/>
+      <second ref="ArapucaSingleIn"/>
       <positionref ref="posArapucaSub3"/>
       </subtraction>
 
-    <box name="ArapucaAcceptanceWindow" lunit="cm"
-      x="@{[$ArapucaAcceptanceWindow_x]}"
+    <box name="ArapucaSingleAcceptanceWindow" lunit="cm"
+      x="@{[$ArapucaSingleAcceptanceWindow_x]}"
       y="@{[$ArapucaAcceptanceWindow_y]}"
       z="@{[$ArapucaAcceptanceWindow_z]}"/>
 
@@ -1548,7 +1548,7 @@ for($ncuts=0 ; $ncuts<4; $ncuts++){
 print CRYO <<EOF;
    <volume name="volOpDetSensitive_$i\-$p\-$ncuts">
      <materialref ref="LAr"/>
-     <solidref ref="ArapucaAcceptanceWindow"/>
+     <solidref ref="ArapucaSingleAcceptanceWindow"/>
    </volume>
 EOF
 }
@@ -1560,7 +1560,7 @@ for($p=0 ; $p<10 ; $p++){
 print CRYO <<EOF;
    <volume name="volArapuca_$i\-$p">
      <materialref ref="FR4SussexAPA"/>
-     <solidref ref="ArapucaWalls"/>
+     <solidref ref="ArapucaSingleWalls"/>
    </volume>
 EOF
 }
@@ -1799,13 +1799,20 @@ sub place_OpDets()
     $apa_i = $_[3];
 
     # Alternate the paddle orientations
-    if ( $apa_i % 2 == 0 ) {
-	$rot = "rIdentity";
-	$posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x-0.1);
+    # if ( $apa_i % 2 == 0 ) {
+	  #   $rot = "rIdentity";
+	  #   $posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x-0.1);
+    # }else{
+	  #   $rot = "rPlus180AboutY";
+	  #   $posAra_x = ($APACenter_x-0.5*$ArapucaOut_x+0.5*$ArapucaAcceptanceWindow_x+0.1);
+	  # }
+    if ($APACenter_x < 0){ # come up with better solution in future (PD facing inward/+x) on the side of cathode
+	    $rot = "rPlus180AboutY";
+	    $posAra_x = ($APACenter_x+0.5*$ArapucaOut_x-0.5*$ArapucaAcceptanceWindow_x+0.1);
     }else{
-	$rot = "rPlus180AboutY";
-	$posAra_x = ($APACenter_x-0.5*$ArapucaOut_x+0.5*$ArapucaAcceptanceWindow_x+0.1);
-	     }
+	    $rot = "rIdentity";
+	    $posAra_x = ($APACenter_x-0.5*$ArapucaOut_x+0.5*$ArapucaAcceptanceWindow_x-0.1);
+	  }
 
 
 for ($paddle = 0; $paddle<$nLightPaddlesPerAPA; $paddle++)
